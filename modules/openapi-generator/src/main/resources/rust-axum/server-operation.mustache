@@ -62,6 +62,9 @@ where
     A: apis::{{classFilename}}::{{classnamePascalCase}}<E{{#havingAuthMethod}}, Claims = C{{/havingAuthMethod}}>{{#vendorExtensions}}{{#x-has-cookie-auth-methods}}+ apis::CookieAuthentication<Claims = C>{{/x-has-cookie-auth-methods}}{{#x-has-header-auth-methods}}+ apis::ApiKeyAuthHeader<Claims = C>{{/x-has-header-auth-methods}}{{#x-has-basic-auth-methods}}+ apis::ApiAuthBasic<Claims = C>{{/x-has-basic-auth-methods}}{{/vendorExtensions}} + Send + Sync,
     E: std::fmt::Debug + Send + Sync + 'static,
         {
+
+        use crate::apis::{{classFilename}}::{{{operationId}}}Response;
+
 {{#vendorExtensions}}
 {{#x-has-auth-methods}}
     // Authentication
@@ -239,7 +242,7 @@ where
   let resp = match result {
                                             Ok(rsp) => match rsp {
 {{#responses}}
-                                                apis::{{classFilename}}::{{{operationId}}}Response::{{#vendorExtensions}}{{x-response-id}}{{/vendorExtensions}}
+                                                {{{operationId}}}Response::{{#vendorExtensions}}{{x-response-id}}{{/vendorExtensions}}
 {{#dataType}}
 {{^headers}}
                                                     (body)

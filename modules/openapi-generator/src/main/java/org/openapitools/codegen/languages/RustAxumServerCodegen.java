@@ -442,12 +442,20 @@ public class RustAxumServerCodegen extends AbstractRustCodegen implements Codege
 
                 axumPath = axumPath.replace(paramSearch, paramReplace);
             }
-            pathMethodOpMap
-                    .computeIfAbsent(axumPath, (key) -> new ArrayList<>())
-                    .add(new MethodOperation(
-                            op.httpMethod.toLowerCase(Locale.ROOT),
-                            underscoredOperationId,
-                            op.vendorExtensions));
+            List<MethodOperation> operations = pathMethodOpMap
+                    .computeIfAbsent(axumPath, (key) -> new ArrayList<>());
+
+            boolean alreadyExists = operations.stream().anyMatch(opEntry ->
+                    opEntry.method.equalsIgnoreCase(op.httpMethod)
+                            && opEntry.operationID.equals(underscoredOperationId)
+            );
+
+            if (!alreadyExists) {
+                operations.add(new MethodOperation(
+                    op.httpMethod.toLowerCase(Locale.ROOT),
+                    underscoredOperationId,
+                    op.vendorExtensions));
+            }
         }
 
         // Determine the types that this operation produces. `getProducesInfo`
@@ -836,7 +844,7 @@ public class RustAxumServerCodegen extends AbstractRustCodegen implements Codege
 
             // Get all tags sorted by name & Combine into a single group
             final String combinedTag = op.tags.stream()
-                    .map(Tag::getName).sorted()
+                    .map(Tag::getName)
                     .collect(Collectors.joining("-"));
             // Add to group
             super.addOperationToGroup(combinedTag, resourcePath, operation, op, operations);
